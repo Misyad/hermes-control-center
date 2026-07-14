@@ -3,20 +3,17 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json package-lock.json* ./
 
-# Install dependencies
-RUN pnpm install --ignore-scripts=false
+# Install dependencies with npm
+RUN npm ci || npm install
 
 # Copy source files
 COPY . .
 
 # Build the application
-RUN pnpm build
+RUN npm run build
 
 # Production stage
 FROM node:22-alpine AS runner
